@@ -1,0 +1,10 @@
+port: "8089"
+
+db:
+  username: "postgres"
+  # change host to service name in docker-compose file
+  host: "localhost"
+  # change port to 5432 in docker container
+  port: "5555"
+  name: "evo-test"
+  password: "postgres"

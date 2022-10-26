@@ -1,0 +1,22 @@
+CREATE TABLE transaction (
+    transactionId SERIAL PRIMARY KEY,
+    requestId INT,
+    terminalId INT,
+    partnerObjectId INT,
+    amountTotal DECIMAL(12, 2),
+    amountOriginal DECIMAL(12, 2),
+    commissionPS DECIMAL(12, 2),
+    commissionClient DECIMAL(12, 2),
+    commissionProvider DECIMAL(12, 2),
+    dateInput TIMESTAMP,
+    datePost TIMESTAMP,
+    status VARCHAR(256),
+    paymentType VARCHAR(256),
+    paymentNumber CHAR(10),
+    serviceId INT,
+    service TEXT,
+    payeeId INT,
+    payeeName TEXT,
+    payeeBankAccount CHAR(17),
+    paymentNarrative TEXT
+);
