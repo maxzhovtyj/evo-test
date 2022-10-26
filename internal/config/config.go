@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"github.com/spf13/viper"
+	"log"
 	"strconv"
 	"sync"
 )
@@ -16,7 +17,7 @@ const (
 	dbPassword = "db.password"
 )
 
-type Storage struct {
+type Repository struct {
 	Host     string `yaml:"host"`
 	Port     uint16 `yaml:"port"`
 	Username string `yaml:"username"`
@@ -26,7 +27,7 @@ type Storage struct {
 
 type Config struct {
 	AppPort string `yaml:"port"`
-	Storage
+	Repository
 }
 
 var instance *Config
@@ -34,8 +35,7 @@ var once sync.Once
 
 func Get() *Config {
 	once.Do(func() {
-
-		fmt.Println("initializing .yml file")
+		log.Println("initializing .yml file")
 		if err := initConfig(); err != nil {
 			panic(fmt.Errorf("panic while initializing .yml file, %v", err))
 		}
@@ -44,16 +44,16 @@ func Get() *Config {
 		if err != nil {
 			return
 		}
-		storageInstance := Storage{
+		storageInstance := Repository{
 			Host:     viper.GetString(dbHost),
 			Port:     uint16(portUint),
 			Username: viper.GetString(dbUsername),
-			Password: viper.GetString(dbUsername),
+			Password: viper.GetString(dbPassword),
 			DBName:   viper.GetString(dbName),
 		}
 		instance = &Config{
-			AppPort: viper.GetString(appPort),
-			Storage: storageInstance,
+			AppPort:    viper.GetString(appPort),
+			Repository: storageInstance,
 		}
 	})
 

@@ -7,7 +7,7 @@ import (
 	"log"
 )
 
-func NewClient(cfg *config.Storage) (*pgx.Conn, error) {
+func NewClient(cfg *config.Repository) (*pgx.Conn, error) {
 	log.Println(cfg)
 	conn, err := pgx.Connect(pgx.ConnConfig{
 		Host:     cfg.Host,
