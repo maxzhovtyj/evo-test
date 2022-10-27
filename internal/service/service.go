@@ -6,7 +6,7 @@ import (
 )
 
 type Service interface {
-	GetTransaction(params models.SearchParams) ([]models.Transaction, error)
+	GetTransactions(params models.SearchParams) ([]models.Transaction, error)
 	LoadData(transactions []models.Transaction) error
 }
 
@@ -18,8 +18,8 @@ func New(repo repository.Repository) Service {
 	return &service{repo: repo}
 }
 
-func (s *service) GetTransaction(params models.SearchParams) ([]models.Transaction, error) {
-	return s.GetTransaction(params)
+func (s *service) GetTransactions(params models.SearchParams) ([]models.Transaction, error) {
+	return s.repo.GetTransactions(params)
 }
 
 func (s *service) LoadData(transactions []models.Transaction) error {

@@ -7,11 +7,11 @@ type Transaction struct {
 	RequestId          int
 	TerminalId         int
 	PartnerObjectId    int
-	AmountTotal        float64
-	AmountOriginal     float64
-	CommissionPS       float64
-	CommissionClient   float64
-	CommissionProvider float64
+	AmountTotal        float32
+	AmountOriginal     float32
+	CommissionPS       float32
+	CommissionClient   float32
+	CommissionProvider float32
 	DateInput          time.Time
 	DatePost           time.Time
 	Status             string

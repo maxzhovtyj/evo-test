@@ -1,13 +1,11 @@
 package models
 
-import "time"
-
 type SearchParams struct {
 	TransactionId    int
-	TerminalIds      []int
+	TerminalIds      []string
 	Status           string
 	PaymentType      string
-	DatePostFrom     time.Time
-	DatePosTo        time.Time
+	DatePostFrom     string
+	DatePostTo       string
 	PaymentNarrative string
 }

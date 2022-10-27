@@ -3,7 +3,7 @@ Accept: application/json
 
 ###
 
-GET http://localhost:8089/api/transaction
+GET http://localhost:8089/api/transaction?transactionId=1&terminalIds=1,2,3,4
 Accept: application/json
 
 ###

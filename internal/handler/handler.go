@@ -63,11 +63,6 @@ func (h *handler) ParseCSVFile(ctx *gin.Context) {
 			return
 		}
 	}
-	//csvFile, err := os.Open("data.csv")
-	//if err != nil {
-	//	newErrorResponse(ctx, http.StatusInternalServerError, "failed to open csv file")
-	//	return
-	//}
 
 	fileInfo := files[0]
 	fileReader, err := fileInfo.Open()
@@ -94,72 +89,22 @@ func (h *handler) ParseCSVFile(ctx *gin.Context) {
 		}
 
 		transactionId, err := strconv.Atoi(read[0])
-		if err != nil {
-			continue
-		}
-
 		requestId, err := strconv.Atoi(read[1])
-		if err != nil {
-			continue
-		}
-
 		terminalId, err := strconv.Atoi(read[2])
-		if err != nil {
-			continue
-		}
-
 		partnerObjectId, err := strconv.Atoi(read[3])
-		if err != nil {
-			continue
-		}
-
-		amountTotal, err := strconv.ParseFloat(read[4], 64)
-		if err != nil {
-			continue
-		}
-
-		amountOriginal, err := strconv.ParseFloat(read[5], 64)
-		if err != nil {
-			return
-		}
-
-		commissionPS, err := strconv.ParseFloat(read[6], 64)
-		if err != nil {
-			return
-		}
-
-		commissionClient, err := strconv.ParseFloat(read[7], 64)
-		if err != nil {
-			return
-		}
-
-		commissionProvider, err := strconv.ParseFloat(read[8], 64)
-		if err != nil {
-			return
-		}
-
+		amountTotal, err := strconv.ParseFloat(read[4], 32)
+		amountOriginal, err := strconv.ParseFloat(read[5], 32)
+		commissionPS, err := strconv.ParseFloat(read[6], 32)
+		commissionClient, err := strconv.ParseFloat(read[7], 32)
+		commissionProvider, err := strconv.ParseFloat(read[8], 32)
 		dateInput, err := time.Parse("2006-01-02 15:04:05", read[9])
-		if err != nil {
-			return
-		}
-
 		datePost, err := time.Parse("2006-01-02 15:04:05", read[10])
-		if err != nil {
-			return
-		}
-
 		serviceId, err := strconv.Atoi(read[14])
-		if err != nil {
-			return
-		}
-
 		payeeId, err := strconv.Atoi(read[16])
-		if err != nil {
-			return
-		}
-
 		payeeBankMfo, err := strconv.Atoi(read[18])
+
 		if err != nil {
+			newErrorResponse(ctx, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -168,11 +113,11 @@ func (h *handler) ParseCSVFile(ctx *gin.Context) {
 			RequestId:          requestId,
 			TerminalId:         terminalId,
 			PartnerObjectId:    partnerObjectId,
-			AmountTotal:        amountTotal,
-			AmountOriginal:     amountOriginal,
-			CommissionPS:       commissionPS,
-			CommissionClient:   commissionClient,
-			CommissionProvider: commissionProvider,
+			AmountTotal:        float32(amountTotal),
+			AmountOriginal:     float32(amountOriginal),
+			CommissionPS:       float32(commissionPS),
+			CommissionClient:   float32(commissionClient),
+			CommissionProvider: float32(commissionProvider),
 			DateInput:          dateInput,
 			DatePost:           datePost,
 			Status:             read[11],
@@ -183,8 +128,8 @@ func (h *handler) ParseCSVFile(ctx *gin.Context) {
 			PayeeId:            payeeId,
 			PayeeName:          read[17],
 			PayeeBankMfo:       payeeBankMfo,
-			PayeeBankAccount:   read[18],
-			PaymentNarrative:   read[19],
+			PayeeBankAccount:   read[19],
+			PaymentNarrative:   read[20],
 		})
 	}
 
@@ -210,58 +155,41 @@ func (h *handler) ParseCSVFile(ctx *gin.Context) {
 // @Param		 datePost query string false "Transaction date post interval, example: '<fromTime>:<toTime>'"
 // @Param		 paymentNarrative query string false "Transaction payment narrative"
 // @Success      200  {array}  	models.Transaction
-// @Failure      400  {string}  string
+// @Failure      400  {object}  object
 // @Failure      500  {object}  object
 // @Router       /api/transaction [get]
 func (h *handler) GetTransaction(ctx *gin.Context) {
-	transactionId, err := strconv.Atoi(ctx.Query("transactionId"))
-	if err != nil {
-		newErrorResponse(ctx, http.StatusBadRequest, "invalid transaction id")
-		return
+	var err error
+
+	var transactionIdInt int
+	transactionId := ctx.Query("transactionId")
+	if transactionId != "" {
+		transactionIdInt, err = strconv.Atoi(transactionId)
+		if err != nil {
+			newErrorResponse(ctx, http.StatusBadRequest, "invalid transaction id")
+			return
+		}
 	}
-	var terminalIdsInt []int
+
 	terminalIds := strings.Split(ctx.Query("terminalIds"), ",")
-	for _, id := range terminalIds {
-		idInt, err := strconv.Atoi(id)
-		if err != nil {
-			return
-		}
-
-		terminalIdsInt = append(terminalIdsInt, idInt)
-	}
-	status := ctx.Query("status")
-	paymentType := ctx.Query("paymentType")
-
-	var datePostFrom time.Time
-	var datePostTo time.Time
-
-	datePost := strings.Split(ctx.Query("datePost"), ":")
-
-	if len(datePost) >= 1 {
-		datePostFrom, err = time.Parse("2006-01-02T15:04:05Z", datePost[0])
-		if err != nil {
-			newErrorResponse(ctx, http.StatusBadRequest, "invalid date post from time")
-			return
-		}
-		if len(datePost) == 2 {
-			datePostTo, err = time.Parse("2006-01-02T15:04:05Z", datePost[1])
+	if terminalIds[0] != "" {
+		for _, id := range terminalIds {
+			_, err = strconv.Atoi(id)
 			if err != nil {
-				newErrorResponse(ctx, http.StatusBadRequest, "invalid date post from time")
+				newErrorResponse(ctx, http.StatusBadRequest, "invalid terminal ids")
 				return
 			}
 		}
 	}
 
-	paymentNarrative := ctx.Query("paymentNarrative")
-
-	transactions, err := h.service.GetTransaction(models.SearchParams{
-		TransactionId:    transactionId,
-		TerminalIds:      terminalIdsInt,
-		Status:           status,
-		PaymentType:      paymentType,
-		DatePostFrom:     datePostFrom,
-		DatePosTo:        datePostTo,
-		PaymentNarrative: paymentNarrative,
+	transactions, err := h.service.GetTransactions(models.SearchParams{
+		TransactionId:    transactionIdInt,
+		TerminalIds:      terminalIds,
+		Status:           ctx.Query("status"),
+		PaymentType:      ctx.Query("paymentType"),
+		DatePostFrom:     ctx.Query("datePostFrom"),
+		DatePostTo:       ctx.Query("datePostTo"),
+		PaymentNarrative: ctx.Query("paymentNarrative"),
 	})
 
 	ctx.JSON(http.StatusOK, transactions)
