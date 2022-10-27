@@ -4,11 +4,9 @@ import (
 	"context"
 	"evo-test/internal/config"
 	"github.com/jackc/pgx"
-	"log"
 )
 
 func NewClient(cfg *config.Repository) (*pgx.Conn, error) {
-	log.Println(cfg)
 	conn, err := pgx.Connect(pgx.ConnConfig{
 		Host:     cfg.Host,
 		Port:     cfg.Port,

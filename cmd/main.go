@@ -6,12 +6,19 @@ import (
 	"evo-test/internal/repository"
 	"evo-test/internal/service"
 	"evo-test/pkg/client/postgres"
-	"github.com/julienschmidt/httprouter"
+	sq "github.com/Masterminds/squirrel"
+	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
 	"time"
 )
 
+// @title Evo Test Task
+// @version 1.0
+// @description API Server Evo Test Task
+
+// @host localhost:8089
+// @BasePath /
 func main() {
 	cfg := config.Get()
 
@@ -22,22 +29,21 @@ func main() {
 		return
 	}
 
-	router := httprouter.New()
+	psql := sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
 
-	repoInstance := repository.New(postgresClient)
+	repoInstance := repository.New(postgresClient, psql)
 	serviceInstance := service.New(repoInstance)
 	handlerInstance := handler.New(serviceInstance)
 
 	log.Println("register handlers...")
-	handlerInstance.Register(router)
-
-	log.Println("run server...")
+	router := handlerInstance.Register()
+	log.Printf("run server on port %s...", cfg.AppPort)
 	if err = runServer(router, cfg); err != nil {
 		log.Fatalf("failed to start server %v", err)
 	}
 }
 
-func runServer(router *httprouter.Router, cfg *config.Config) error {
+func runServer(router *gin.Engine, cfg *config.Config) error {
 	srv := &http.Server{
 		Addr:           ":" + cfg.AppPort,
 		Handler:        router,

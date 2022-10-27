@@ -1,0 +1,9 @@
+POST http://localhost:8089/api/load-csv
+Accept: application/json
+
+###
+
+GET http://localhost:8089/api/transaction
+Accept: application/json
+
+###
