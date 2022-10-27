@@ -16,6 +16,50 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/load-data": {
+            "post": {
+                "description": "load data",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "api"
+                ],
+                "summary": "Load data to database from a csv file",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "CSV file with data",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/apperror.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/apperror.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/api/transaction": {
             "get": {
                 "description": "get transaction",
@@ -29,31 +73,165 @@ const docTemplate = `{
                     "api"
                 ],
                 "summary": "Gets a transaction",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Transaction id",
+                        "name": "transactionId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Array with terminal ids, example: '1,2,3,4,5'",
+                        "name": "terminalIds",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Transaction status",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Transaction payment type",
+                        "name": "paymentType",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Transaction date post interval, example: '\u003cfromTime\u003e:\u003ctoTime\u003e'",
+                        "name": "datePost",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Transaction payment narrative",
+                        "name": "paymentNarrative",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Transaction"
+                            }
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "type": "object"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object"
+                            "$ref": "#/definitions/apperror.Error"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "type": "object"
+                            "$ref": "#/definitions/apperror.Error"
                         }
                     }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "apperror.Error": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Transaction": {
+            "type": "object",
+            "properties": {
+                "amountOriginal": {
+                    "type": "number",
+                    "example": 1
+                },
+                "amountTotal": {
+                    "type": "number",
+                    "example": 1
+                },
+                "commissionClient": {
+                    "type": "number",
+                    "example": 0
+                },
+                "commissionPS": {
+                    "type": "number",
+                    "example": 0
+                },
+                "commissionProvider": {
+                    "type": "number",
+                    "example": 0
+                },
+                "dateInput": {
+                    "type": "string",
+                    "example": "2022-08-12 11:25:27.000000"
+                },
+                "datePost": {
+                    "type": "string",
+                    "example": "2022-08-12 14:25:27.000000"
+                },
+                "partnerObjectId": {
+                    "type": "integer",
+                    "example": 1111
+                },
+                "payeeBankAccount": {
+                    "type": "string",
+                    "example": "UA713451373919523"
+                },
+                "payeeBankMFO": {
+                    "type": "string",
+                    "example": "254751"
+                },
+                "payeeId": {
+                    "type": "integer",
+                    "example": 14232155
+                },
+                "payeeName": {
+                    "type": "string",
+                    "example": "pumb"
+                },
+                "paymentNarrative": {
+                    "type": "string",
+                    "example": "Перерахування коштів згідно договору про надання послуг А11/27122 від 19.11.2020 р."
+                },
+                "paymentNumber": {
+                    "type": "string",
+                    "example": "PS16698205"
+                },
+                "paymentType": {
+                    "type": "string",
+                    "example": "cash"
+                },
+                "requestId": {
+                    "type": "integer",
+                    "example": 20020
+                },
+                "service": {
+                    "type": "string",
+                    "example": "Поповнення карток"
+                },
+                "serviceId": {
+                    "type": "integer",
+                    "example": 13980
+                },
+                "status": {
+                    "type": "string",
+                    "example": "accepted"
+                },
+                "terminalId": {
+                    "type": "integer",
+                    "example": 3506
+                },
+                "transactionId": {
+                    "type": "integer",
+                    "example": 1
                 }
             }
         }

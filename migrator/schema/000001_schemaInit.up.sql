@@ -17,6 +17,7 @@ CREATE TABLE transaction (
     service TEXT,
     payeeId INT,
     payeeName TEXT,
+    payeeBankMFO char(6),
     payeeBankAccount CHAR(17),
     paymentNarrative TEXT
 );

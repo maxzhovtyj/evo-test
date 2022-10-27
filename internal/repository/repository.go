@@ -51,10 +51,11 @@ func (r *repository) InsertData(transactions []models.Transaction) error {
 			service,
 			payeeId,
 			payeeName,
+			payeeBankMFO,
 			payeeBankAccount,
 			paymentNarrative)
 		VALUES 
-			($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)
+			($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21)
 		`, transactionTable,
 	)
 
@@ -78,6 +79,7 @@ func (r *repository) InsertData(transactions []models.Transaction) error {
 			tr.Service,
 			tr.PayeeId,
 			tr.PayeeName,
+			tr.PayeeBankMFO,
 			tr.PayeeBankAccount,
 			tr.PaymentNarrative,
 		)
@@ -108,6 +110,7 @@ var transactionTableColumns = []string{
 	"service",
 	"payeeId",
 	"payeeName",
+	"payeeBankMFO",
 	"payeeBankAccount",
 	"paymentNarrative",
 }
@@ -154,7 +157,6 @@ func (r *repository) GetTransactions(params models.SearchParams) ([]models.Trans
 		return nil, err
 	}
 
-	fmt.Println(querySelectTransactionsSql)
 	rows, err := r.db.Query(querySelectTransactionsSql, args...)
 	if err != nil {
 		return nil, err
@@ -162,6 +164,7 @@ func (r *repository) GetTransactions(params models.SearchParams) ([]models.Trans
 
 	for rows.Next() {
 		var tr models.Transaction
+
 		err = rows.Scan(
 			&tr.TransactionId,
 			&tr.RequestId,
@@ -181,6 +184,7 @@ func (r *repository) GetTransactions(params models.SearchParams) ([]models.Trans
 			&tr.Service,
 			&tr.PayeeId,
 			&tr.PayeeName,
+			&tr.PayeeBankMFO,
 			&tr.PayeeBankAccount,
 			&tr.PaymentNarrative,
 		)

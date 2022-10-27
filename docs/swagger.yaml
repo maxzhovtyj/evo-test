@@ -1,4 +1,77 @@
 basePath: /
+definitions:
+  apperror.Error:
+    properties:
+      message:
+        type: string
+    type: object
+  models.Transaction:
+    properties:
+      amountOriginal:
+        example: 1
+        type: number
+      amountTotal:
+        example: 1
+        type: number
+      commissionClient:
+        example: 0
+        type: number
+      commissionPS:
+        example: 0
+        type: number
+      commissionProvider:
+        example: 0
+        type: number
+      dateInput:
+        example: "2022-08-12 11:25:27.000000"
+        type: string
+      datePost:
+        example: "2022-08-12 14:25:27.000000"
+        type: string
+      partnerObjectId:
+        example: 1111
+        type: integer
+      payeeBankAccount:
+        example: UA713451373919523
+        type: string
+      payeeBankMFO:
+        example: "254751"
+        type: string
+      payeeId:
+        example: 14232155
+        type: integer
+      payeeName:
+        example: pumb
+        type: string
+      paymentNarrative:
+        example: Перерахування коштів згідно договору про надання послуг А11/27122
+          від 19.11.2020 р.
+        type: string
+      paymentNumber:
+        example: PS16698205
+        type: string
+      paymentType:
+        example: cash
+        type: string
+      requestId:
+        example: 20020
+        type: integer
+      service:
+        example: Поповнення карток
+        type: string
+      serviceId:
+        example: 13980
+        type: integer
+      status:
+        example: accepted
+        type: string
+      terminalId:
+        example: 3506
+        type: integer
+      transactionId:
+        example: 1
+        type: integer
+    type: object
 host: localhost:8089
 info:
   contact: {}
@@ -6,30 +79,82 @@ info:
   title: Evo Test Task
   version: "1.0"
 paths:
+  /api/load-data:
+    post:
+      consumes:
+      - multipart/form-data
+      description: load data
+      parameters:
+      - description: CSV file with data
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/apperror.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/apperror.Error'
+      summary: Load data to database from a csv file
+      tags:
+      - api
   /api/transaction:
     get:
       consumes:
       - application/json
       description: get transaction
+      parameters:
+      - description: Transaction id
+        in: query
+        name: transactionId
+        type: integer
+      - description: 'Array with terminal ids, example: ''1,2,3,4,5'''
+        in: query
+        name: terminalIds
+        type: string
+      - description: Transaction status
+        in: query
+        name: status
+        type: string
+      - description: Transaction payment type
+        in: query
+        name: paymentType
+        type: string
+      - description: 'Transaction date post interval, example: ''<fromTime>:<toTime>'''
+        in: query
+        name: datePost
+        type: string
+      - description: Transaction payment narrative
+        in: query
+        name: paymentNarrative
+        type: string
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            type: object
+            items:
+              $ref: '#/definitions/models.Transaction'
+            type: array
         "400":
           description: Bad Request
           schema:
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            type: object
+            $ref: '#/definitions/apperror.Error'
         "500":
           description: Internal Server Error
           schema:
-            type: object
+            $ref: '#/definitions/apperror.Error'
       summary: Gets a transaction
       tags:
       - api
