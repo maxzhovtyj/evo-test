@@ -9,7 +9,28 @@ import (
 )
 
 const (
-	transactionTable = "transaction"
+	transactionTable   = "transaction"
+	transactionId      = "transaction_id"
+	requestId          = "request_id"
+	terminalId         = "terminal_id"
+	partnerObjectId    = "partner_object_id"
+	amountTotal        = "amount_total"
+	amountOriginal     = "amount_original"
+	commissionPs       = "commission_ps"
+	commissionClient   = "commission_client"
+	commissionProvider = "commission_provider"
+	dateInput          = "date_input"
+	datePost           = "date_post"
+	status             = "status"
+	paymentType        = "payment_type"
+	paymentNumber      = "payment_number"
+	serviceId          = "service_id"
+	service            = "service"
+	payeeId            = "payee_id"
+	payeeName          = "payee_name"
+	payeeBankMfo       = "payee_bank_mfo"
+	payeeBankAccount   = "payee_bank_account"
+	paymentNarrative   = "payment_narrative"
 )
 
 type Repository interface {
@@ -29,60 +50,64 @@ func New(conn *pgx.Conn, qb sq.StatementBuilderType) Repository {
 	}
 }
 
-func (r *repository) InsertData(transactions []models.Transaction) error {
-	queryInsertTransaction := fmt.Sprintf(
-		`
-		INSERT INTO %s
-			(transactionId, 
-			requestId,
-			terminalId,
-			partnerObjectId,
-			amountTotal,
-			amountOriginal,
-			commissionPS,
-			commissionClient,
-			commissionProvider,
-			dateInput,
-			datePost,
-			status,
-			paymentType,
-			paymentNumber,
-			serviceId,
-			service,
-			payeeId,
-			payeeName,
-			payeeBankMFO,
-			payeeBankAccount,
-			paymentNarrative)
-		VALUES 
-			($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21)
-		`, transactionTable,
-	)
+var transactionInsertColumns = []string{
+	transactionTable,
+	transactionId,
+	requestId,
+	terminalId,
+	partnerObjectId,
+	amountTotal,
+	amountOriginal,
+	commissionPs,
+	commissionClient,
+	commissionProvider,
+	dateInput,
+	datePost,
+	status,
+	paymentType,
+	paymentNumber,
+	serviceId,
+	service,
+	payeeId,
+	payeeName,
+	payeeBankMfo,
+	payeeBankAccount,
+	paymentNarrative,
+}
 
+func (r *repository) InsertData(transactions []models.Transaction) error {
 	for _, tr := range transactions {
-		_, err := r.db.Exec(queryInsertTransaction,
-			tr.TransactionId,
-			tr.RequestId,
-			tr.TerminalId,
-			tr.PartnerObjectId,
-			tr.AmountTotal,
-			tr.AmountOriginal,
-			tr.CommissionPS,
-			tr.CommissionClient,
-			tr.CommissionProvider,
-			tr.DateInput,
-			tr.DatePost,
-			tr.Status,
-			tr.PaymentType,
-			tr.PaymentNumber,
-			tr.ServiceId,
-			tr.Service,
-			tr.PayeeId,
-			tr.PayeeName,
-			tr.PayeeBankMFO,
-			tr.PayeeBankAccount,
-			tr.PaymentNarrative,
-		)
+		queryInsertTransaction, args, err := r.queryBuilder.
+			Insert(strings.Join(transactionInsertColumns, ", ")).
+			Into(transactionTable).
+			Values(
+				tr.TransactionId,
+				tr.RequestId,
+				tr.TerminalId,
+				tr.PartnerObjectId,
+				tr.AmountTotal,
+				tr.AmountOriginal,
+				tr.CommissionPS,
+				tr.CommissionClient,
+				tr.CommissionProvider,
+				tr.DateInput,
+				tr.DatePost,
+				tr.Status,
+				tr.PaymentType,
+				tr.PaymentNumber,
+				tr.ServiceId,
+				tr.Service,
+				tr.PayeeId,
+				tr.PayeeName,
+				tr.PayeeBankMFO,
+				tr.PayeeBankAccount,
+				tr.PaymentNarrative,
+			).ToSql()
+		if err != nil {
+			return err
+		}
+
+		_, err = r.db.Exec(queryInsertTransaction, args...)
 		if err != nil {
 			return err
 		}
@@ -92,27 +117,27 @@ func (r *repository) InsertData(transactions []models.Transaction) error {
 }
 
 var transactionTableColumns = []string{
-	"transactionId",
-	"requestId",
-	"terminalId",
-	"partnerObjectId",
-	"amountTotal",
-	"amountOriginal",
-	"commissionPS",
-	"commissionClient",
-	"commissionProvider",
-	"dateInput",
-	"datePost",
-	"status",
-	"paymentType",
-	"paymentNumber",
-	"serviceId",
-	"service",
-	"payeeId",
-	"payeeName",
-	"payeeBankMFO",
-	"payeeBankAccount",
-	"paymentNarrative",
+	transactionId,
+	requestId,
+	terminalId,
+	partnerObjectId,
+	amountTotal,
+	amountOriginal,
+	commissionPs,
+	commissionClient,
+	commissionProvider,
+	dateInput,
+	datePost,
+	status,
+	paymentType,
+	paymentNumber,
+	serviceId,
+	service,
+	payeeId,
+	payeeName,
+	payeeBankMfo,
+	payeeBankAccount,
+	paymentNarrative,
 }
 
 func (r *repository) GetTransactions(params models.SearchParams) ([]models.Transaction, error) {
@@ -123,33 +148,38 @@ func (r *repository) GetTransactions(params models.SearchParams) ([]models.Trans
 		From(transactionTable)
 
 	if params.TransactionId != 0 {
-		query = query.Where(sq.Eq{"transactionId": params.TransactionId})
+		query = query.Where(sq.Eq{transactionId: params.TransactionId})
 	}
 
 	if len(params.TerminalIds) != 0 && params.TerminalIds[0] != "" {
 		ids := strings.Join(params.TerminalIds, ", ")
-		query = query.Where(fmt.Sprintf("terminalId IN (%s)", ids))
+		IdsInRangeStr := fmt.Sprintf("%s IN (%s)", terminalId, ids)
+		query = query.Where(IdsInRangeStr)
 	}
 
 	if params.Status != "" {
-		query = query.Where(sq.Eq{"status": params.Status})
+		query = query.Where(sq.Eq{status: params.Status})
 	}
 
 	if params.PaymentNarrative != "" {
 		narrativeLower := strings.ToLower(params.PaymentNarrative)
-		query = query.Where(sq.Like{"LOWER(paymentNarrative)": "%" + narrativeLower + "%"})
+
+		narrativeKey := fmt.Sprintf("LOWER(%s)", paymentNarrative)
+		narrativeValue := fmt.Sprintf("%%%s%%", narrativeLower)
+
+		query = query.Where(sq.Like{narrativeKey: narrativeValue})
 	}
 
 	if params.PaymentType != "" {
-		query = query.Where(sq.Eq{"paymentType": params.PaymentType})
+		query = query.Where(sq.Eq{paymentType: params.PaymentType})
 	}
 
 	if params.DatePostFrom != "" {
-		query = query.Where(sq.GtOrEq{"datePost": params.DatePostFrom})
+		query = query.Where(sq.GtOrEq{datePost: params.DatePostFrom})
 	}
 
 	if params.DatePostTo != "" {
-		query = query.Where(sq.LtOrEq{"datePost": params.DatePostTo})
+		query = query.Where(sq.LtOrEq{datePost: params.DatePostTo})
 	}
 
 	querySelectTransactionsSql, args, err := query.ToSql()
