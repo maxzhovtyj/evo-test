@@ -1,10 +1,11 @@
 package repository
 
 import (
+	"context"
 	"evo-test/internal/models"
 	"fmt"
 	sq "github.com/Masterminds/squirrel"
-	"github.com/jackc/pgx"
+	"github.com/jackc/pgx/v5"
 	"strings"
 )
 
@@ -107,7 +108,7 @@ func (r *repository) InsertData(transactions []models.Transaction) error {
 			return err
 		}
 
-		_, err = r.db.Exec(queryInsertTransaction, args...)
+		_, err = r.db.Exec(context.Background(), queryInsertTransaction, args...)
 		if err != nil {
 			return err
 		}
@@ -187,7 +188,7 @@ func (r *repository) GetTransactions(params models.SearchParams) ([]models.Trans
 		return nil, err
 	}
 
-	rows, err := r.db.Query(querySelectTransactionsSql, args...)
+	rows, err := r.db.Query(context.Background(), querySelectTransactionsSql, args...)
 	if err != nil {
 		return nil, err
 	}
