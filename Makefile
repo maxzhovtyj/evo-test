@@ -8,4 +8,9 @@ initDB:
 
 .PHONY: swagInit
 swagInit:
-	swag init -g ./cmd
+	swag init -g ./cmd/main.go
+
+.PHONY: composeUpBuild
+composeUpBuild:
+	docker compose up --build server
+

@@ -177,11 +177,11 @@ const docTemplate = `{
                 },
                 "dateInput": {
                     "type": "string",
-                    "example": "2022-08-12 11:25:27.000000"
+                    "example": "2022-08-12T11:25:27Z"
                 },
                 "datePost": {
                     "type": "string",
-                    "example": "2022-08-12 14:25:27.000000"
+                    "example": "2022-08-12T14:25:27Z"
                 },
                 "partnerObjectId": {
                     "type": "integer",

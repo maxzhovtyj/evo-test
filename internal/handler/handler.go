@@ -12,9 +12,8 @@ import (
 )
 
 const (
-	paramsCtx     = "params"
-	parsedDataCtx = "parsedData"
-
+	paramsCtx      = "params"
+	parsedDataCtx  = "parsedData"
 	swaggerUrl     = "/swagger/*any"
 	apiUrl         = "/api"
 	loadDataUrl    = "/load-data"

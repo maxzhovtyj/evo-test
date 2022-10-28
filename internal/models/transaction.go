@@ -12,8 +12,8 @@ type Transaction struct {
 	CommissionPS       float32   `example:"0.00"`
 	CommissionClient   float32   `example:"0.00"`
 	CommissionProvider float32   `example:"0.00"`
-	DateInput          time.Time `example:"2022-08-12 11:25:27.000000"`
-	DatePost           time.Time `example:"2022-08-12 14:25:27.000000"`
+	DateInput          time.Time `example:"2022-08-12T11:25:27Z"`
+	DatePost           time.Time `example:"2022-08-12T14:25:27Z"`
 	Status             string    `example:"accepted"`
 	PaymentType        string    `example:"cash"`
 	PaymentNumber      string    `example:"PS16698205"`

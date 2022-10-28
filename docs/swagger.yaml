@@ -23,10 +23,10 @@ definitions:
         example: 0
         type: number
       dateInput:
-        example: "2022-08-12 11:25:27.000000"
+        example: "2022-08-12T11:25:27Z"
         type: string
       datePost:
-        example: "2022-08-12 14:25:27.000000"
+        example: "2022-08-12T14:25:27Z"
         type: string
       partnerObjectId:
         example: 1111
