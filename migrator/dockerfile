@@ -1,6 +1,6 @@
 FROM migrate/migrate
 
-COPY /migrator /migrations
+COPY /schema /schema
 
 
 

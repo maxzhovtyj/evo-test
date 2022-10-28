@@ -1,6 +1,5 @@
 version: "3.9"
 
-# TODO migrator service
 services:
   server:
     build: ./
