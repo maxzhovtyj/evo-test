@@ -1,9 +1,18 @@
-POST http://localhost:8089/api/load-csv
-Accept: application/json
+POST http://localhost:8089/api/load-data HTTP/1.1
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="data.csv"
+Content-Type: application/csv
+
+// below will the path to the file (i.e. data.csv)
+< data.csv
+--WebAppBoundary
+Content-Disposition: form-data; name="file"
 
 ###
 
-GET http://localhost:8089/api/transaction?transactionId=1&terminalIds=1,2,3,4
+GET http://localhost:8089/api/transaction?transactionId=1&terminalIds=3506,3507
 Accept: application/json
 
 ###

@@ -24,3 +24,15 @@ docker build -t evo-migrator .
 ```
 docker run --network host evo-migrator -path=/schema -database "postgresql://postgres:postgres@localhost:5555/postgres?sslmode=disable" up
 ```
+
+---
+
+## Usage
+##### To test the app use either [test-api file](test-api.http) or [swagger docs](#swagger-docs)
+
+---
+
+# swagger-docs
+##### http://localhost:8089/swagger/index.html
+
+![swag-img](swagger-example.png)

@@ -118,7 +118,7 @@ paths:
         in: query
         name: transactionId
         type: integer
-      - description: 'Array with terminal ids, example: ''1,2,3,4,5'''
+      - description: 'Array with terminal ids, example: 3506,3507'
         in: query
         name: terminalIds
         type: string
@@ -130,9 +130,13 @@ paths:
         in: query
         name: paymentType
         type: string
-      - description: 'Transaction date post interval, example: ''<fromTime>:<toTime>'''
+      - description: Transaction min date post
         in: query
-        name: datePost
+        name: datePostFrom
+        type: string
+      - description: Transaction max date post
+        in: query
+        name: datePostTo
         type: string
       - description: Transaction payment narrative
         in: query

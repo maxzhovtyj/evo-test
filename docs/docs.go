@@ -82,7 +82,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "Array with terminal ids, example: '1,2,3,4,5'",
+                        "description": "Array with terminal ids, example: 3506,3507",
                         "name": "terminalIds",
                         "in": "query"
                     },
@@ -100,8 +100,14 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "Transaction date post interval, example: '\u003cfromTime\u003e:\u003ctoTime\u003e'",
-                        "name": "datePost",
+                        "description": "Transaction min date post",
+                        "name": "datePostFrom",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Transaction max date post",
+                        "name": "datePostTo",
                         "in": "query"
                     },
                     {
